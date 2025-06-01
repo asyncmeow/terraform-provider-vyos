@@ -7,8 +7,8 @@ terraform {
 }
 
 provider "vyos" {
-  host = "https://172.26.0.57"
-  key = "test"
+  host     = "https://172.26.0.57"
+  key      = "test"
   insecure = true
 }
 
