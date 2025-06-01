@@ -62,9 +62,16 @@ func (d *ethernetDataSource) Schema(_ context.Context, _ datasource.SchemaReques
 }
 
 func (d *ethernetDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	ctx = tflog.SetField(ctx, "ethernet_interface", "eth0")
+	var inputModel ethernetInterfaceDataSourceModel
+	diags := req.Config.Get(ctx, &inputModel)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	ctx = tflog.SetField(ctx, "ethernet_interface", inputModel.Name.ValueString())
 	tflog.Info(ctx, "fetching ethernet interface")
-	out, _, err := d.client.Conf.Get(ctx, "interfaces ethernet eth0", nil)
+	out, _, err := d.client.Conf.Get(ctx, "interfaces ethernet "+inputModel.Name.ValueString(), nil)
 	if err != nil {
 		resp.Diagnostics.AddError("Unable to read ethernet interface", err.Error())
 		return

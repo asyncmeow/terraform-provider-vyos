@@ -13,7 +13,7 @@ provider "vyos" {
 }
 
 data "vyos_ethernet_interface" "eth0" {
-  name = "eth0"
+  name = "eth2"
 }
 
 output "test" {
