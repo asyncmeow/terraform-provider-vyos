@@ -5,10 +5,12 @@ package provider
 
 import (
 	"context"
-	"github.com/hashicorp/terraform-plugin-framework/path"
-	"github.com/hashicorp/terraform-plugin-framework/types"
 	"os"
 	"strconv"
+
+	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -123,6 +125,12 @@ func (p *vyosProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 		return
 	}
 
+	ctx = tflog.SetField(ctx, "vyos_host", host)
+	ctx = tflog.SetField(ctx, "vyos_key", key)
+	ctx = tflog.SetField(ctx, "vyos_insecure", insecure)
+	ctx = tflog.MaskFieldValuesWithFieldKeys(ctx, "vyos_key")
+
+	tflog.Debug(ctx, "creating vyos client")
 	client := vyos.NewClient(nil).WithToken(key).WithURL(host)
 	if insecure {
 		client = client.Insecure()
@@ -130,6 +138,8 @@ func (p *vyosProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 
 	resp.DataSourceData = client
 	resp.ResourceData = client
+
+	tflog.Info(ctx, "configured vyos provider", map[string]any{"success": true})
 }
 
 // DataSources defines the data sources implemented in the provider.

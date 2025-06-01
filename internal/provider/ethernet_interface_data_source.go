@@ -12,6 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 
 	"terraform-provider-vyos/internal/provider/vyos_models"
 )
@@ -61,20 +62,24 @@ func (d *ethernetDataSource) Schema(_ context.Context, _ datasource.SchemaReques
 }
 
 func (d *ethernetDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+	ctx = tflog.SetField(ctx, "ethernet_interface", "eth0")
+	tflog.Info(ctx, "fetching ethernet interface")
 	out, _, err := d.client.Conf.Get(ctx, "interfaces ethernet eth0", nil)
 	if err != nil {
 		resp.Diagnostics.AddError("Unable to read ethernet interface", err.Error())
 		return
 	}
-
+	tflog.Debug(ctx, "got http response", map[string]any{"response": out})
 	jsonString, _ := json.Marshal(out.Data)
+	tflog.Trace(ctx, "re-marshalled response", map[string]any{"json_str": jsonString})
 	stateJson := vyos_models.InterfacesEthernet{}
 	err = json.Unmarshal(jsonString, &stateJson)
-
 	if err != nil {
 		resp.Diagnostics.AddError("failed to unmarshal response", err.Error())
 		return
 	}
+	tflog.Trace(ctx, "un-marshalled response", map[string]any{"response": stateJson})
+
 	addresses, diags := types.ListValueFrom(ctx, types.StringType, stateJson.Addresses)
 	resp.Diagnostics.Append(diags...)
 	state := ethernetInterfaceDataSourceModel{
