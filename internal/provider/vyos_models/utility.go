@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	// ErrUnsupportedType is returned if the type is not implemented
+	// ErrUnsupportedType is returned if the type is not implemented.
 	ErrUnsupportedType = errors.New("unsupported type")
 
 	_ json.Unmarshaler = &MultiValuedString{}
