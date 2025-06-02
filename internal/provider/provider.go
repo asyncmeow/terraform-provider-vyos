@@ -145,7 +145,7 @@ func (p *vyosProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 // DataSources defines the data sources implemented in the provider.
 func (p *vyosProvider) DataSources(_ context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
-		NewEthernetInterfaceDataSource,
+		NewInterfacesEthernetDataSource,
 	}
 }
 

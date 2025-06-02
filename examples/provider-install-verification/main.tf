@@ -12,10 +12,10 @@ provider "vyos" {
   insecure = true
 }
 
-data "vyos_ethernet_interface" "eth0" {
+data "vyos_interfaces_ethernet" "eth0" {
   name = "eth2"
 }
 
 output "test" {
-  value = data.vyos_ethernet_interface.eth0
+  value = data.vyos_interfaces_ethernet.eth0
 }

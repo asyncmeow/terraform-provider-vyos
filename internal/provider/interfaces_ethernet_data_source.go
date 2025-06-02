@@ -18,19 +18,19 @@ import (
 )
 
 var (
-	_ datasource.DataSource              = &ethernetDataSource{}
-	_ datasource.DataSourceWithConfigure = &ethernetDataSource{}
+	_ datasource.DataSource              = &interfacesEthernetDataSource{}
+	_ datasource.DataSourceWithConfigure = &interfacesEthernetDataSource{}
 )
 
-func NewEthernetInterfaceDataSource() datasource.DataSource {
-	return &ethernetDataSource{}
+func NewInterfacesEthernetDataSource() datasource.DataSource {
+	return &interfacesEthernetDataSource{}
 }
 
-type ethernetDataSource struct {
+type interfacesEthernetDataSource struct {
 	client *vyos.Client
 }
 
-func (d *ethernetDataSource) Configure(_ context.Context, req datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
+func (d *interfacesEthernetDataSource) Configure(_ context.Context, req datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
@@ -47,11 +47,11 @@ func (d *ethernetDataSource) Configure(_ context.Context, req datasource.Configu
 	d.client = client
 }
 
-func (d *ethernetDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_ethernet_interface"
+func (d *interfacesEthernetDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_interfaces_ethernet"
 }
 
-func (d *ethernetDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *interfacesEthernetDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"name":      schema.StringAttribute{Required: true},
@@ -61,8 +61,8 @@ func (d *ethernetDataSource) Schema(_ context.Context, _ datasource.SchemaReques
 	}
 }
 
-func (d *ethernetDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var inputModel ethernetInterfaceDataSourceModel
+func (d *interfacesEthernetDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+	var inputModel interfacesEthernetDataSourceModel
 	diags := req.Config.Get(ctx, &inputModel)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -89,7 +89,7 @@ func (d *ethernetDataSource) Read(ctx context.Context, req datasource.ReadReques
 
 	addresses, diags := types.ListValueFrom(ctx, types.StringType, stateJson.Addresses)
 	resp.Diagnostics.Append(diags...)
-	state := ethernetInterfaceDataSourceModel{
+	state := interfacesEthernetDataSourceModel{
 		Address: addresses,
 		HwId:    types.StringValue(stateJson.HwId),
 	}
@@ -101,7 +101,7 @@ func (d *ethernetDataSource) Read(ctx context.Context, req datasource.ReadReques
 	}
 }
 
-type ethernetInterfaceDataSourceModel struct {
+type interfacesEthernetDataSourceModel struct {
 	Name    types.String `tfsdk:"name"`
 	Address types.List   `tfsdk:"addresses"`
 	HwId    types.String `tfsdk:"hw_id"`
